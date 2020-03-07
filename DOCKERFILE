@@ -1,0 +1,10 @@
+FROM ubuntu:latest
+
+
+RUN apt-get update && apt-get install -q -y \
+    vim \
+    gcc \
+    build-essential \
+
+COPY src/ /opt/ciptables/src
+
