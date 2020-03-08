@@ -63,34 +63,34 @@ int processCommand(const int argc, const char const **argv)
 
 int RunDemo()
 {
-    const char const *table = "mangle";
-    const char const *chain = "TEST";
+    const char const *tableName = "mangle";
+    const char const *chainName = "TEST";
     unsigned short port = 1600;
 
-    printf("\r\nStep 1: Listing `%s` Table...\r\n\n", table);
-    Iptables()->listTable(table);
+    printf("\r\nStep 1: Listing `%s` Table...\r\n\n", tableName);
+    Iptables()->listTable(tableName);
 
-    printf("Step 2: Creating `%s` chain in `%s` Table...\r\n", chain, table);
-    Iptables()->createChain(table, chain);
+    printf("Step 2: Creating `%s` chain in `%s` Table...\r\n", chainName, tableName);
+    Iptables()->createChain(tableName, chainName);
 
-    printf("\r\nStep 3: Listing `%s` Table (you should see a new '%s' chain)...\r\n\n", table, chain);
-    Iptables()->listTable(table);
+    printf("\r\nStep 3: Listing `%s` Table (you should see a new '%s' chain)...\r\n\n", tableName, chainName);
+    Iptables()->listTable(tableName);
 
-    printf("Step 4: Appending Dummy Rule to '%s' Chain in `%s` Table...\r\n", chain, table);
-    Iptables()->appendRuleToChain(table, chain, GetDummyIptEntry(port));
+    printf("Step 4: Appending Dummy Rule to '%s' Chain in `%s` Table...\r\n", chainName, tableName);
+    Iptables()->appendRuleToChain(tableName, chainName, GetDummyIptEntry(port));
 
-    printf("\r\nStep 5: Listing `%s` Table (you should see a new rule in the `%s` chain)...\r\n\n", table, chain);
-    Iptables()->listTable(table);
+    printf("\r\nStep 5: Listing `%s` Table (you should see a new rule in the `%s` chain)...\r\n\n", tableName, chainName);
+    Iptables()->listTable(tableName);
 
-    printf("Step 6: Deleting Rule from the `%s` chain in `%s` Table...\r\n", chain, table);
-    Iptables()->deleteRuleFromChain(table, chain, 1);
+    printf("Step 6: Deleting Rule from the `%s` chain in `%s` Table...\r\n", chainName, tableName);
+    Iptables()->deleteRuleFromChain(tableName, chainName, 1);
 
-    printf("\r\nStep 7: Listing `%s` Table (you should see one less rule in the `%s` chain)...\r\n\n", table, chain);
-    Iptables()->listTable(table);
+    printf("\r\nStep 7: Listing `%s` Table (you should see one less rule in the `%s` chain)...\r\n\n", tableName, chainName);
+    Iptables()->listTable(tableName);
 
-    printf("Step 8: Deleting `%s` chain from `%s` Table...\r\n", chain, table);
-    Iptables()->deleteChain(table, chain);
+    printf("Step 8: Deleting `%s` chain from `%s` Table...\r\n", chainName, tableName);
+    Iptables()->deleteChain(tableName, chainName);
 
-    printf("\r\nStep 9: Listing `%s` Table (you should see one chain in the table)...\r\n\n", table);
-    Iptables()->listTable(table);
+    printf("\r\nStep 9: Listing `%s` Table (you should see one chain in the table)...\r\n\n", tableName);
+    Iptables()->listTable(tableName);
 }
