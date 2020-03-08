@@ -7,7 +7,7 @@ Write a C program that can list, add, modify, and delete iptables rules, in mult
 * IPTables Version: iptables v1.6.1
 * Kernel Version: 4.15.0-1057-aws
 * GCC Version: 7.4.0
-* Other Libraries: iptables.dev
+* Other Libraries: iptables-dev
 
 ## How to do this programmatically?
 
