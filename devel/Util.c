@@ -73,7 +73,7 @@ const char *GetPrintableProto(unsigned short proto)
 }
 
 /*
- * Dummy ipt_entry will set dcsp value of tcp packets matching destination prt 1111 to 0x1A 
+ * Dummy ipt_entry will set dcsp value of tcp packets matching destination prt to 0x1A 
  */
 const struct ipt_entry const *GetDummyIptEntry(unsigned short port)
 {
