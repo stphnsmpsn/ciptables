@@ -20,7 +20,7 @@
 #include "../../Ciptables.h"
 #include "../../Util.h"
 
-static void PrintChainHeader(const char const *chain, const char const *policy);
+static void PrintChainHeader(const char const *chainName, const char const *policy);
 static void PrintRule(int num, const char *target, const struct ipt_entry *entry);
 static bool ValidateHandle(struct xtc_handle *xHandle);
 
@@ -90,9 +90,9 @@ static int DeleteChain(const char const *tableName, const char const *chainName)
     return SUCCESS;
 }
 
-static void PrintChainHeader(const char const *chain, const char const *policy)
+static void PrintChainHeader(const char const *chainName, const char const *policy)
 {
-    printf("Chain %s", chain);
+    printf("Chain %s", chainName);
     if (policy != NULL)
         printf("(policy %s)", policy);
     printf("\r\n");
@@ -108,30 +108,30 @@ static void PrintRule(int num, const char *target, const struct ipt_entry *entry
     printf("%-3d %-24s %s  --  %s        %s\r\n", num, target, GetPrintableProto(entry->ip.proto), srcStr, dstStr);
 }
 
-static int AppendRuleToChain(const char const *table, const xt_chainlabel chainLabel, const struct ipt_entry const *entry)
+static int AppendRuleToChain(const char const *tableName, const char const *chainName, const struct ipt_entry const *entry)
 {
-    struct xtc_handle *xHandle = iptc_init(table);
+    struct xtc_handle *xHandle = iptc_init(tableName);
 
     if (!ValidateHandle(xHandle))
     {
         return errno;
     }
 
-    iptc_append_entry(chainLabel, entry, xHandle);
+    iptc_append_entry(chainName, entry, xHandle);
     iptc_commit(xHandle);
     iptc_free(xHandle);
     return SUCCESS;
 }
 
-static int ReplaceRuleInChain(const char const *table, const xt_chainlabel chainLabel, const struct ipt_entry const *entry, int num)
+static int ReplaceRuleInChain(const char const *tableName, const char const *chainName, const struct ipt_entry const *entry, int num)
 {
-    struct xtc_handle *xHandle = iptc_init(table);
+    struct xtc_handle *xHandle = iptc_init(tableName);
 
     if (!ValidateHandle(xHandle))
     {
         return errno;
     }
-    iptc_replace_entry(chainLabel, entry, num, xHandle);
+    iptc_replace_entry(chainName, entry, num, xHandle);
     iptc_commit(xHandle);
     iptc_free(xHandle);
     return SUCCESS;
@@ -140,9 +140,9 @@ static int ReplaceRuleInChain(const char const *table, const xt_chainlabel chain
 /* This is only being used as my kernel was not compatible with the other method and I did not have time to modify it. 
  * Please see Delete() below for how I would really implement a delete by number in chain method
  */
-static int MvpDeleteNumberInChain(const char const *table, const char const *chain, const int num)
+static int MvpDeleteNumberInChain(const char const *tableName, const char const *chainName, const int num)
 {
-    struct xtc_handle *xHandle = iptc_init(table);
+    struct xtc_handle *xHandle = iptc_init(tableName);
 
     if (!ValidateHandle(xHandle))
     {
@@ -155,7 +155,7 @@ static int MvpDeleteNumberInChain(const char const *table, const char const *cha
     c = iptc_first_chain(xHandle);
     while (c)
     {
-        if (strcmp(c, chain) == 0)
+        if (strcmp(c, chainName) == 0)
         {
             e = iptc_first_rule(c, xHandle);
             int n = 0;
@@ -179,16 +179,16 @@ end:
     return SUCCESS;
 }
 
-static int DeleteNumberInChain(const char const *table, const char const *chain, const int num)
+static int DeleteNumberInChain(const char const *tableName, const char const *chainName, const int num)
 {
-    struct xtc_handle *xHandle = iptc_init(table);
+    struct xtc_handle *xHandle = iptc_init(tableName);
 
     if (!ValidateHandle(xHandle))
     {
         return errno;
     }
 
-    iptc_delete_num_entry(chain, num, xHandle);
+    iptc_delete_num_entry(chainName, num, xHandle);
     iptc_commit(xHandle);
     iptc_free(xHandle);
     return SUCCESS;
