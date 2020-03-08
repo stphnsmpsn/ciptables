@@ -14,6 +14,8 @@
         "iptablesimplementation.h": "c",
         "iptablesinterface.h": "c",
         "stdlib.h": "c",
-        "commandparser.h": "c"
+        "commandparser.h": "c",
+        "util.h": "c",
+        "xt_limit.h": "c"
     }
 }

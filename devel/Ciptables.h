@@ -8,7 +8,4 @@
 #define ERROR_NOT_IMPLEMENTED -4
 #define ERROR_ILLEGAL_ARGUMENTS -5
 
-#define TABLE_NAME_IDX 1
-#define CMD_NAME_IDX 2
-
 #endif

@@ -1,0 +1,1 @@
+/usr/bin/gcc -g ./devel/Ciptables.c ./devel/Util.c ./devel/CommandParser.c ./devel/ServiceLocator/Iptables/Iptables.c ./devel/ServiceLocator/Iptables/IptablesImplementation.c ./devel/ServiceLocator/Iptables/NullIptablesImplementation.c ./devel/ServiceLocator/Null/NullFunctions.c -o ./build/ciptables -lip4tc

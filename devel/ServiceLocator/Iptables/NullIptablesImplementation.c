@@ -7,11 +7,12 @@ bool GetNullIptables(IptablesInterface *interface)
     if (interface == NULL)
         return false;
 
-    interface->list = (IptablesFunctionPointer)NullReturnUninitialized;
-    interface->add = (IptablesFunctionPointer)NullReturnUninitialized;
-    interface->modify = (IptablesFunctionPointer)NullReturnUninitialized;
-    interface->delete = (IptablesFunctionPointer)NullReturnUninitialized;
-    interface->unsupported = (IptablesFunctionPointer)NullReturnUninitialized;
+    interface->listTable = (IptablesListFunctionPointer)NullReturnUninitialized;
+    interface->createChain = (IptablesCreateChainFunctionPointer)NullReturnUninitialized;
+    interface->deleteChain = (IptablesDeleteChainFunctionPointer)NullReturnUninitialized;
+    interface->appendRuleToChain = (IptablesAppendEntryToChainFunctionPointer)NullReturnUninitialized;
+    interface->replaceRuleInChain = (IptablesReplaceRuleFunctionPointer)NullReturnUninitialized;
+    interface->deleteRuleFromChain = (IptablesDeleteNumberInChainFunctionPointer)NullReturnUninitialized;
 
     return true;
 }

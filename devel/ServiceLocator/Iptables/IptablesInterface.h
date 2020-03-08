@@ -1,14 +1,22 @@
 #ifndef SERVICELOCATORIPTABLESINTERFACE_H
 #define SERVICELOCATORIPTABLESINTERFACE_H
 
-typedef int (*IptablesFunctionPointer)(const char **argv);
+#include <libiptc/libiptc.h>
+
+typedef int (*IptablesListFunctionPointer)(const char const *tableName);
+typedef int (*IptablesCreateChainFunctionPointer)(const char const *tableName, const char const *chainName);
+typedef int (*IptablesDeleteChainFunctionPointer)(const char const *tableName, const char const *chainName);
+typedef int (*IptablesAppendEntryToChainFunctionPointer)(const char const * table, const xt_chainlabel chainLabel, const struct ipt_entry const * entry);
+typedef int (*IptablesReplaceRuleFunctionPointer)(const char const * table, const xt_chainlabel chainLabel, const struct ipt_entry const * entry, int num);
+typedef int (*IptablesDeleteNumberInChainFunctionPointer)(const char const* table, const char const* chain, const int num);
 
 typedef struct {
-    IptablesFunctionPointer list;
-    IptablesFunctionPointer add;
-    IptablesFunctionPointer modify;
-    IptablesFunctionPointer delete;
-    IptablesFunctionPointer unsupported;
+    IptablesListFunctionPointer listTable;
+    IptablesCreateChainFunctionPointer createChain;
+    IptablesDeleteChainFunctionPointer deleteChain;
+    IptablesAppendEntryToChainFunctionPointer appendRuleToChain;
+    IptablesReplaceRuleFunctionPointer replaceRuleInChain;
+    IptablesDeleteNumberInChainFunctionPointer deleteRuleFromChain;
 } IptablesInterface;
 
 #endif

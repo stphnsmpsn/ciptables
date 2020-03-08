@@ -4,13 +4,13 @@
 #include "../Null/NullFunctions.h"
 
 static IptablesInterface iptables = {
-    .list = (IptablesFunctionPointer)NullReturnUninitialized,
-    .add = (IptablesFunctionPointer)NullReturnUninitialized,
-    .modify = (IptablesFunctionPointer)NullReturnUninitialized,
-    .delete = (IptablesFunctionPointer)NullReturnUninitialized,
-    .unsupported = (IptablesFunctionPointer)NullReturnUninitialized,
+    .listTable = (IptablesListFunctionPointer)NullReturnUninitialized,
+    .createChain = (IptablesCreateChainFunctionPointer)NullReturnUninitialized,
+    .deleteChain = (IptablesDeleteChainFunctionPointer)NullReturnUninitialized,
+    .appendRuleToChain = (IptablesAppendEntryToChainFunctionPointer)NullReturnUninitialized,
+    .replaceRuleInChain = (IptablesReplaceRuleFunctionPointer)NullReturnUninitialized,
+    .deleteRuleFromChain = (IptablesDeleteNumberInChainFunctionPointer)NullReturnUninitialized,
 };
-
 
 bool SetIptables(InitIptablesInterface init)
 {

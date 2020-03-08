@@ -1,6 +1,8 @@
-#include <netinet/in.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/errno.h>
+#include <linux/netfilter/xt_DSCP.h>
 #include "Ciptables.h"
 #include "Util.h"
 
@@ -16,7 +18,7 @@
 #define MH 9
 #define UNKNOWN 10
 
-static const char* const printableProto[] = {
+static const char *const printableProto[] = {
     "all",
     "tcp",
     "udp",
@@ -27,10 +29,21 @@ static const char* const printableProto[] = {
     "ah",
     "sctp",
     "mh",
-    "unknown"
-};
+    "unknown"};
 
-const char *getProtocol(unsigned short proto)
+void GetPrintableIp(uint32_t addr, char *result, size_t maxLen)
+{
+  if (addr == 0)
+  {
+    snprintf(result, maxLen, "anywhere");
+  }
+  else
+  {
+    snprintf(result, maxLen, "%d.%d.%d.%d", (addr & 0xFF), ((addr >> 8) & 0xFF), ((addr >> 16) & 0xFF), ((addr >> 24) & 0xFF));
+  }
+}
+
+const char *GetPrintableProto(unsigned short proto)
 {
   switch (proto)
   {
@@ -59,8 +72,45 @@ const char *getProtocol(unsigned short proto)
   }
 }
 
-void printHeader(){
-  printf("*************************************************\r\n");
-  printf("               steve's ciptables                \r\n");
-  printf("*************************************************\r\n");
+/*
+ * Dummy ipt_entry will set dcsp value of tcp packets matching destination prt 1111 to 0x1A 
+ */
+const struct ipt_entry const *GetDummyIptEntry(unsigned short port)
+{
+  struct ipt_entry *e = NULL;
+  unsigned int targetOffset = XT_ALIGN(sizeof(struct ipt_entry)) + XT_ALIGN(sizeof(struct ipt_entry_match)) + XT_ALIGN(sizeof(struct xt_tcp));
+  unsigned int totalLen = targetOffset + (XT_ALIGN(sizeof(struct xt_entry_target)) + XT_ALIGN(sizeof(struct xt_DSCP_info)));
+  e = (struct ipt_entry *)calloc(1, totalLen);
+  if (e == NULL)
+  {
+    printf("calloc failure :%s\n", strerror(errno));
+    return e;
+  }
+
+  e->target_offset = targetOffset;
+  e->next_offset = totalLen;
+  e->ip.proto = 6;
+  e->ip.invflags = 0x0;
+
+  struct ipt_entry_match *matchTcp = (struct ipt_entry_match *)((void *)e->elems + 0);
+  struct xt_tcp *tcpInfo;
+
+  struct xt_entry_target *dscpTarget = (struct xt_entry_target *)((void *)e->elems + XT_ALIGN(sizeof(struct ipt_entry_match)) + XT_ALIGN(sizeof(struct xt_tcp)));
+  struct xt_DSCP_info *dscpInfo;
+
+  matchTcp->u.match_size = XT_ALIGN(sizeof(struct ipt_entry_match)) + XT_ALIGN(sizeof(struct xt_tcp));
+  strcpy(matchTcp->u.user.name, "tcp");
+  tcpInfo = (struct xt_tcp *)matchTcp->data;
+  tcpInfo->spts[0] = 0x0;
+  tcpInfo->spts[1] = 0xFFFF;
+  tcpInfo->dpts[0] = port;
+  tcpInfo->dpts[1] = port;
+  tcpInfo->invflags = 0x0000;
+
+  dscpTarget->u.target_size = (XT_ALIGN(sizeof(struct xt_entry_target)) + XT_ALIGN(sizeof(struct xt_DSCP_info)));
+  strcpy(dscpTarget->u.user.name, "DSCP");
+  dscpTarget->u.user.revision = 0x0;
+  dscpInfo = (struct xt_DSCP_info *)dscpTarget->data;
+  dscpInfo->dscp = 0x1A;
+  return e;
 }

@@ -17,7 +17,7 @@
                 "${fileDirname}/ServiceLocator/Iptables/NullIptablesImplementation.c",
                 "${fileDirname}/ServiceLocator/Null/NullFunctions.c",
                 "-o",
-                "${fileDirname}/../build/${fileBasenameNoExtension}",
+                "${fileDirname}/../build/ciptables",
                 "-lip4tc"
             ],
             "options": {
