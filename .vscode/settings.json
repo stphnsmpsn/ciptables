@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "libiptc.h": "c",
+        "dlfcn.h": "c",
+        "stdio.h": "c",
+        "iptables.h": "c",
+        "xt_dscp.h": "c",
+        "xt_physdev.h": "c",
+        "x_tables.h": "c",
+        "in.h": "c",
+        "xt_rateest.h": "c",
+        "ciptables.h": "c",
+        "nullfunctions.h": "c",
+        "iptablesimplementation.h": "c",
+        "iptablesinterface.h": "c",
+        "stdlib.h": "c",
+        "commandparser.h": "c"
+    }
+}
