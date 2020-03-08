@@ -34,25 +34,42 @@ The interface defines a contract that the application must implement the followi
     Iptables()->listTable(tableName);
     ```
 
-   Output: `Iptables()->listTable("mangle");`
+   Output: `Iptables()->listTable("filter");`
 
    ```
-    Chain PREROUTING(policy ACCEPT)
-    num target                   prot opt source          destination
-
+    ubuntu@ip-172-31-46-220:~/ciptables/build$ sudo ./ciptables lt filter
     Chain INPUT(policy ACCEPT)
     num target                   prot opt source          destination
+    1   ACCEPT                   tcp  --  anywhere        anywhere
 
-    Chain FORWARD(policy ACCEPT)
+    Chain FORWARD(policy DROP)
     num target                   prot opt source          destination
+    1   DOCKER-USER              all  --  anywhere        anywhere
+    2   DOCKER-ISOLATION-STAGE-1 all  --  anywhere        anywhere
+    3   ACCEPT                   all  --  anywhere        anywhere
+    4   DOCKER                   all  --  anywhere        anywhere
+    5   ACCEPT                   all  --  anywhere        anywhere
+    6   ACCEPT                   all  --  anywhere        anywhere
 
     Chain OUTPUT(policy ACCEPT)
     num target                   prot opt source          destination
-    1   DSCP                     tcp  --  anywhere        anywhere
-    2   DSCP                     tcp  --  anywhere        anywhere
 
-    Chain POSTROUTING(policy ACCEPT)
+    Chain DOCKER
     num target                   prot opt source          destination
+
+    Chain DOCKER-ISOLATION-STAGE-1
+    num target                   prot opt source          destination
+    1   DOCKER-ISOLATION-STAGE-2 all  --  anywhere        anywhere
+    2   RETURN                   all  --  anywhere        anywhere
+
+    Chain DOCKER-ISOLATION-STAGE-2
+    num target                   prot opt source          destination
+    1   DROP                     all  --  anywhere        anywhere
+    2   RETURN                   all  --  anywhere        anywhere
+
+    Chain DOCKER-USER
+    num target                   prot opt source          destination
+    1   RETURN                   all  --  anywhere        anywhere
    ```
 
 2) Create Chain
