@@ -8,6 +8,9 @@
 int main(const int argc, const char const **argv)
 {
   SetIptables(GetIptables);
-  return processCommand(argc, argv);
+  Iptables()->setup();
+  ProcessCommand(argc, argv);
+  Iptables()->teardown();
+  return SUCCESS; // todo: properly handle error codes returned by above functions
 }
 

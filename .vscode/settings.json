@@ -16,6 +16,8 @@
         "stdlib.h": "c",
         "commandparser.h": "c",
         "util.h": "c",
-        "xt_limit.h": "c"
+        "xt_limit.h": "c",
+        "string.h": "c",
+        "xt_mark.h": "c"
     }
 }

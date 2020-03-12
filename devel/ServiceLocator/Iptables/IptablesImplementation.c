@@ -1,3 +1,4 @@
+#include <sqlite3.h>
 #include <stdio.h>
 #include <sys/errno.h>
 #include <stdlib.h>
@@ -20,9 +21,19 @@
 #include "../../Ciptables.h"
 #include "../../Util.h"
 
+#define MAX_STATEMENT_LENGTH 1024 // made up value for now
+static const char const *databaseName = "iptables.db";
+
 static void PrintChainHeader(const char const *chainName, const char const *policy);
 static void PrintRule(int num, const char *target, const struct ipt_entry *entry);
 static bool ValidateHandle(struct xtc_handle *xHandle);
+static int InitDatabase();
+static int ExecuteSqlStmt(char *sql);
+static void ClearSqlBuffer();
+
+static sqlite3 *db;
+static bool open = false;
+static char sql[MAX_STATEMENT_LENGTH];
 
 static int ListTable(const char const *tableName)
 {
@@ -69,9 +80,15 @@ static int CreateChain(const char const *tableName, const char const *chainName)
         return errno;
     }
 
+    // todo: error handling
     iptc_create_chain(chainName, xHandle);
     iptc_commit(xHandle);
     iptc_free(xHandle);
+
+    // build and execute SQL statement
+    snprintf(sql, sizeof(sql), ";");
+    ExecuteSqlStmt(sql);
+
     return SUCCESS;
 }
 
@@ -84,9 +101,15 @@ static int DeleteChain(const char const *tableName, const char const *chainName)
         return errno;
     }
 
+    // todo: error handling
     iptc_delete_chain(chainName, xHandle);
     iptc_commit(xHandle);
     iptc_free(xHandle);
+
+    // build and execute SQL statement
+    snprintf(sql, sizeof(sql), ";");
+    ExecuteSqlStmt(sql);
+
     return SUCCESS;
 }
 
@@ -120,6 +143,11 @@ static int AppendRuleToChain(const char const *tableName, const char const *chai
     iptc_append_entry(chainName, entry, xHandle);
     iptc_commit(xHandle);
     iptc_free(xHandle);
+
+    // build and execute SQL statement
+    snprintf(sql, sizeof(sql), ";");
+    ExecuteSqlStmt(sql);
+
     return SUCCESS;
 }
 
@@ -134,6 +162,11 @@ static int ReplaceRuleInChain(const char const *tableName, const char const *cha
     iptc_replace_entry(chainName, entry, num, xHandle);
     iptc_commit(xHandle);
     iptc_free(xHandle);
+
+    // build and execute SQL statement
+    snprintf(sql, sizeof(sql), ";");
+    ExecuteSqlStmt(sql);
+
     return SUCCESS;
 }
 
@@ -167,6 +200,9 @@ static int MvpDeleteNumberInChain(const char const *tableName, const char const 
                 {
                     iptc_delete_entry(c, e, (unsigned char *)target, xHandle);
                     iptc_commit(xHandle);
+                        // build and execute SQL statement
+                        snprintf(sql, sizeof(sql), ";");
+                        ExecuteSqlStmt(sql);
                     goto end;
                 }
                 e = iptc_next_rule(e, xHandle);
@@ -191,7 +227,72 @@ static int DeleteNumberInChain(const char const *tableName, const char const *ch
     iptc_delete_num_entry(chainName, num, xHandle);
     iptc_commit(xHandle);
     iptc_free(xHandle);
+
+    // build and execute SQL statement
+    snprintf(sql, sizeof(sql), ";");
+    ExecuteSqlStmt(sql);
+
     return SUCCESS;
+}
+
+static int Setup()
+{
+    int result;
+    if (!open)
+    {
+        result = sqlite3_open(databaseName, &db);
+        if (result == SQLITE_OK)
+        {
+            open = true;
+            result = InitDatabase();
+        }
+    }
+    else
+    {
+        result = ERROR_GENERIC_ERROR; // todo: replace w/more detailed error
+    }
+    return result;
+}
+
+static int InitDatabase()
+{
+    int result;
+    char *err_msg = 0;
+    char *sql = ""; // Create initial DB structure (if it does not exist)
+    // this means creating a table for the iptables (filter, nat, mangle, raw, and security)
+    // and a filter for the chains. Chains table should have a foreign key tying the entry to an iptable
+
+
+    result = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (result != SQLITE_OK)
+    {
+
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+
+        return 1;
+        return result;
+    }
+}
+
+static int Teardown()
+{
+    int result;
+    if (open)
+    {
+        result = sqlite3_close(db);
+        if (result == SQLITE_OK)
+        {
+            open = false;
+        }
+    }
+    else
+    {
+        result = ERROR_GENERIC_ERROR; // todo: replace w/more detailed error
+    }
+    return result;
 }
 
 bool GetIptables(IptablesInterface *interface)
@@ -199,6 +300,8 @@ bool GetIptables(IptablesInterface *interface)
     if (interface == NULL)
         return false;
 
+    interface->setup = (IptablesSetupFunctionPointer)Setup;
+    interface->teardown = (IptablesTeardownFunctionPointer)Teardown;
     interface->listTable = (IptablesListFunctionPointer)ListTable;
     interface->createChain = (IptablesCreateChainFunctionPointer)CreateChain;
     interface->deleteChain = (IptablesDeleteChainFunctionPointer)DeleteChain;
@@ -220,4 +323,25 @@ static bool ValidateHandle(struct xtc_handle *xHandle)
     {
         return true;
     }
+}
+
+static int ExecuteSqlStmt(char *sql)
+{
+    char *err = 0;
+    int rc = sqlite3_exec(db, sql, 0, 0, &err);
+
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "SQL Error: %s\n", err);
+        sqlite3_free(err);
+        sqlite3_close(db);
+    }
+
+    ClearSqlBuffer();
+    return rc;
+}
+
+static void ClearSqlBuffer()
+{
+    memset(sql, 0, sizeof(sql));
 }

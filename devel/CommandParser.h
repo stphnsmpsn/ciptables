@@ -42,6 +42,6 @@
 
 #define CMD_DEMO_NUM_ARGS 0
 
-int processCommand(const int argc, const char const **argv);
+int ProcessCommand(const int argc, const char const **argv);
 
 #endif

@@ -9,8 +9,13 @@
 
 int RunDemo();
 
-int processCommand(const int argc, const char const **argv)
+int ProcessCommand(const int argc, const char const **argv)
 {
+
+    if(argc ==1){
+        printf("No Command Given, The program will exit now...\r\n");
+        return SUCCESS;
+    }
 
     // Lists all rules in each chain for the specified table
     if (strcmp(argv[CMD_NAME_IDX], CMD_LIST_TABLE) == 0)

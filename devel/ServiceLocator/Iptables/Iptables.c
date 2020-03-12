@@ -4,6 +4,8 @@
 #include "../Null/NullFunctions.h"
 
 static IptablesInterface iptables = {
+    .setup = (IptablesSetupFunctionPointer) NullReturnUninitialized,
+    .teardown = (IptablesTeardownFunctionPointer) NullReturnUninitialized,
     .listTable = (IptablesListFunctionPointer)NullReturnUninitialized,
     .createChain = (IptablesCreateChainFunctionPointer)NullReturnUninitialized,
     .deleteChain = (IptablesDeleteChainFunctionPointer)NullReturnUninitialized,

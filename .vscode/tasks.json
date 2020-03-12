@@ -18,7 +18,8 @@
                 "${fileDirname}/ServiceLocator/Null/NullFunctions.c",
                 "-o",
                 "${fileDirname}/../build/ciptables",
-                "-lip4tc"
+                "-lip4tc",
+                "-lsqlite3"
             ],
             "options": {
                 "cwd": "/usr/bin"
