@@ -2,7 +2,6 @@
 #include <sys/errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <iptables.h>
 #include <libiptc/libiptc.h>
 #include <linux/netfilter/xt_limit.h>
 #include <linux/netfilter/xt_physdev.h>

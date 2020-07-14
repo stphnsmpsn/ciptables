@@ -2,7 +2,7 @@
 #define UTIL_H
 
 #include <stdint.h>
-#include <iptables.h>
+#include <libiptc/libiptc.h>
 
 const struct ipt_entry const *GetDummyIptEntry(unsigned short port);
 const char *GetPrintableProto(unsigned short proto);
